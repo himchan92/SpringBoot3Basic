@@ -33,7 +33,7 @@ public class ArticleController {
         //2. repository -> entity save
         Article saved = articleRepository.save(article); //저장 JPA
         log.info(saved.toString());
-        return "";
+        return "redirect:/articles/" + saved.getId();
     }
 
     @GetMapping("/articles/{id}")
