@@ -6,7 +6,9 @@ import com.example.firstproject.repository.ArticleRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
@@ -30,5 +32,18 @@ public class ArticleController {
         Article saved = articleRepository.save(article); //저장 JPA
         log.info(saved.toString());
         return "";
+    }
+
+    @GetMapping("/articles/{id}")
+    public String show(@PathVariable Long id, Model model) {
+        log.info("id = " + id);
+
+        //id조회해 데이터 가져오기
+        Article articleEntity = articleRepository.findById(id).orElse(null);
+
+        //모델에 데이터 담아 뷰로 전달
+        model.addAttribute("article", articleEntity);
+
+        return "articles/show";
     }
 }
