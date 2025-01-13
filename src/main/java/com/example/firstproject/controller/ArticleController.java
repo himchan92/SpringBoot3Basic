@@ -61,4 +61,27 @@ public class ArticleController {
 
         return "articles/index";
     }
+
+    @GetMapping("/articles/{id}/edit")
+    public String edit(@PathVariable Long id, Model model) {
+        //수정대상 데이터 가져오기
+        Article article = articleRepository.findById(id).orElse(null);
+        model.addAttribute("article", article);
+        return "articles/edit";
+    }
+
+    @PostMapping("/articles/update")
+    public String update(ArticleForm form) {
+        log.info(form.toString());
+        //DTO -> Entity 변경
+        Article articleEntity = form.toEntity();
+        log.info(articleEntity.toString());
+
+        Article target = articleRepository.findById(articleEntity.getId()).orElse(null);
+
+        if(target != null) {
+            articleRepository.save(articleEntity);
+        }
+        return "redirect:/articles/" + articleEntity.getId();
+    }
 }
