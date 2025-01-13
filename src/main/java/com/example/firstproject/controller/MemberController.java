@@ -78,4 +78,16 @@ public class MemberController {
         }
         return "redirect:/members/" + memberEntity.getId();
     }
+
+    @GetMapping("/members/{id}/delete")
+    public String delete(@PathVariable Long id) {
+        //삭제대상 가져오기
+        Member member = memberRepository.findById(id).orElse(null);
+
+        if(member != null) {
+            memberRepository.save(member);
+        }
+
+        return "redirect:/members";
+    }
 }
