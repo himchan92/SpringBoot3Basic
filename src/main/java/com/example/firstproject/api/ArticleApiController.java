@@ -3,6 +3,7 @@ package com.example.firstproject.api;
 import com.example.firstproject.dto.ArticleForm;
 import com.example.firstproject.entity.Article;
 import com.example.firstproject.repository.ArticleRepository;
+import com.example.firstproject.service.ArticleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,52 +17,22 @@ import java.util.List;
 public class ArticleApiController {
 
     @Autowired
-    private ArticleRepository articleRepository;
+    private ArticleService articleService;
 
-    //GET
     @GetMapping("/api/articles")
     public Iterable<Article> index() {
-        return articleRepository.findAll();
+        return articleService.index();
     }
 
     @GetMapping("/api/articles/{id}")
     public Article show(@PathVariable Long id) {
-        return articleRepository.findById(id).orElse(null);
+        return articleService.show(id);
     }
 
     @PostMapping("/api/articles")
-    public Article create(@RequestBody ArticleForm form) { //POST Body데이터 전달위해 @RequestBody필수
-        Article article = form.toEntity();
-        return articleRepository.save(article);
-    }
-
-    @PatchMapping("/api/articles/{id}")
-    public ResponseEntity<Article> update(@PathVariable Long id, @RequestBody ArticleForm dto) {
-        Article article = dto.toEntity();
-        log.info("id: {}, article: {}", id, article.toString());
-
-        Article target = articleRepository.findById(id).orElse(null);
-
-        if(target == null || id != article.getId()) {
-            log.info("잘못된 요청! id: {}, article: {}", id, article.toString());
-
-            //Rest API 응답상태 반환위한 ENUM 사용
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        }
-
-        Article updated = articleRepository.save(article);
-        return ResponseEntity.status(HttpStatus.OK).body(updated);
-    }
-
-    @DeleteMapping("/api/articles/{id}")
-    public ResponseEntity<Article> delete(@PathVariable Long id) {
-        Article target = articleRepository.findById(id).orElse(null);
-
-        if(target == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        }
-
-        articleRepository.save(target);
-        return ResponseEntity.status(HttpStatus.OK).build();
+    public ResponseEntity<Article> create(@RequestBody ArticleForm dto) {
+        Article created = articleService.create(dto);
+        return (created != null) ? ResponseEntity.status(HttpStatus.OK).body(created) :
+                ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 }
